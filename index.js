@@ -113,4 +113,4 @@ function findPopulation(){
     })
 }
 
-setInterval(findPopulation, 5000);
+setInterval(findPopulation, 1000);
