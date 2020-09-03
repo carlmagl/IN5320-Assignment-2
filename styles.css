@@ -33,12 +33,6 @@
     flex-direction: column;
   }
   
-  
-  .image{
-    max-width: 300px;
-    border-radius: 200px;
-  }
-  
   .header {
     height: 80px;
     background-color: #264653;
@@ -114,9 +108,6 @@
     }
     .main-content{
       max-width: 95%;
-    }
-    .header{
-      display: none;
     }
   }
 

@@ -3,7 +3,6 @@ async function getPopulation(country) {
     let data = await response.json();
     return data;
 }
-getPopulation('Norway').then(data => console.log(data));
 
 let allCountries = [];
 
@@ -33,11 +32,10 @@ function addListElement(){
     let input = document.getElementById("input").value;
     
     if(allCountries.includes(input)){
-        if(input != '' || !names.includes(input)){
+        if(input != '' && !names.includes(input)){
             createListElement(input);
             names.push(input);
             localStorage.setItem("names", JSON.stringify(names));
-            console.log(localStorage);
         }else{
             alert(input + " already exist");
         }
@@ -50,9 +48,8 @@ function addListElement(){
 function removeListElement(name){
     document.getElementById(name).remove();
     names = names.filter(e => e !== name);
-    console.log(names)
-    console.log("Removed" + name)
     localStorage.setItem("names", JSON.stringify(names));
+    countryInterval.delete(name)
 }
 
 function doesElementStartWith(element, searchWord){
@@ -62,7 +59,6 @@ function doesElementStartWith(element, searchWord){
 
 function search(){
     let searchWord = document.getElementById('search').value;
-    console.log(searchWord);
     let filtered = names.filter(country => doesElementStartWith(country, searchWord))
     ul = document.getElementById("list");
     li = ul.getElementsByTagName('li');
@@ -87,7 +83,7 @@ function createListElement(countryName){
     populationNumber.innerHTML = "NaN"
     li.id = countryName;
     p.innerHTML = countryName;
-    button.innerHTML = "Remove";
+    button.innerHTML = "X";
     button.setAttribute("onclick","removeListElement(this.id)");
     button.id = countryName;
     li.appendChild(p);
@@ -96,14 +92,25 @@ function createListElement(countryName){
     liste.appendChild(li);
 }
 
+countryInterval = new Map();
+
 
 function findPopulation(){
     names.forEach(country => {
-        getPopulation(country).then(data => {
-            li = document.getElementById("population" + country);
-            li.innerHTML = data.total_population[1].population;
-        })
+        console.log(country);
+        let populationCount = document.getElementById("population" + country);
+        if(!countryInterval.has(country)){
+            let populationInterval;
+            getPopulation(country).then(data => {
+                populationCount = document.getElementById("population" + country);
+                populationCount.innerHTML = data.total_population[1].population;
+                populationInterval = data.total_population[1].population - data.total_population[0].population; 
+                populationInterval = populationInterval/86400;
+                countryInterval.set(country, populationInterval);
+            })
+        }
+        populationCount.innerHTML = Math.ceil(Number(populationCount.innerHTML) + Number(countryInterval.get(country)));
     })
 }
 
-setInterval(findPopulation, 1000);
+setInterval(findPopulation, 5000);
